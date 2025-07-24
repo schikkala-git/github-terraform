@@ -21,7 +21,7 @@ resource "local_file" "private_key_pem" {
 resource "aws_security_group" "ec2_sg" {
   name        = "private-ec2-sg"
   description = "Allow internal VPC traffic"
-  vpc_id      = "vpc-0f0ca2e5e4458f0af" # <-- Replace with your VPC ID
+  vpc_id      = "vpc-0a46471ea02347e79" # <-- Replace with your VPC ID
 
   ingress {
     from_port   = 22
@@ -42,7 +42,7 @@ resource "aws_security_group" "ec2_sg" {
 resource "aws_instance" "private_ec2" {
   ami                    = "ami-020cba7c55df1f615" # Amazon Linux 2 in us-east-1 (update as needed)
   instance_type          = "t3.micro"
-  subnet_id              = "subnet-09efa2557ded7889f" # <-- Replace with your private subnet ID
+  subnet_id              = "subnet-0470c544d22bdacaf" # <-- Replace with your private subnet ID
   vpc_security_group_ids = [aws_security_group.ec2_sg.id]
   key_name               = aws_key_pair.ec2_key_pair.key_name
   associate_public_ip_address = false
