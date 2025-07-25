@@ -3,11 +3,50 @@ name: Srini Terraform deployment to AWS
 on:
   push:
     branches:
-      - development
+      - development  # Auto-trigger on development branch
+  workflow_dispatch:  
+  # Allows manual trigger for main branch (e.g., for main)
 
 jobs:
-  deploy:
-    name: Deploy Terraform on AWS
+  deploy-dev:
+    if: github.ref == 'refs/heads/development'
+    name: Auto Deploy Terraform on Dev
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.6.6
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Terraform Init
+        run: terraform init
+
+      - name: List Terraform Files After Init
+        run: ls -Rla .
+
+      - name: Terraform Validate
+        run: terraform validate
+
+      - name: Terraform Plan
+        run: terraform plan -out=tfplan
+
+      - name: Terraform Apply
+        run: terraform apply -auto-approve tfplan
+
+  deploy-main:
+    if: github.ref == 'refs/heads/main' && github.event_name == 'workflow_dispatch'
+    name: Manual Deploy Terraform on Main
     runs-on: ubuntu-latest
 
     steps:
